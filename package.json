@@ -1,15 +1,14 @@
 {
-  "name": "kbotify-template",
-  "version": "0.0.1",
-  "description": "Starter kit for kBotify bots",
+  "name": "kook-apex-chan",
+  "version": "0.1.0",
+  "description": "KOOK Apex stats bot",
   "main": "src/index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node --nolazy -r ts-node/register -r tsconfig-paths/register src/index.ts"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fi6/kbotify-template.git"
+    "url": "git+https://github.com/Hexona69/kook-apex-chan.git"
   },
   "keywords": [
     "kbotify",
@@ -19,13 +18,22 @@
   "author": "FlappyIce",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/fi6/kbotify-template/issues"
+    "url": "https://github.com/Hexona69/kook-apex-chan/issues"
   },
-  "homepage": "https://github.com/fi6/kbotify-template#readme",
+  "homepage": "https://github.com/Hexona69/kook-apex-chan#readme",
   "dependencies": {
-    "kbotify": "^0.2.5"
+    "axios": "^1.3.0",
+    "kbotify": "^0.2.5",
+    "memory-cache": "^0.2.0",
+    "puppeteer": "^19.6.2",
+    "sharp": "^0.31.3",
+    "tracker.gg": "^1.1.2",
+    "ts-node": "^10.9.1",
+    "upath": "^2.0.1"
   },
   "devDependencies": {
+    "@types/memory-cache": "^0.2.2",
+    "@types/sharp": "^0.31.1",
     "@typescript-eslint/eslint-plugin": "^4.28.4",
     "@typescript-eslint/parser": "^4.28.4",
     "eslint": "^7.31.0",

@@ -3,4 +3,6 @@ export default {
     khlkey: 'encrypt key here',
     khltoken: 'token here',
     khlverify: 'verify token here',
+    trackerggKey: '',
+    alsKey: ''
 };

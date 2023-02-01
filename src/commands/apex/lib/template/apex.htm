@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Apex Chan</title>
+    <style>
+        * {
+            padding: 0px;
+            margin: 0px;
+            font-size: 64px;
+        }
+
+        html {
+            width: 4000px;
+            height: 3000px;
+        }
+
+        div#container {
+            width: 4000px;
+            height: 3000px;
+            background-color: gray;
+            background-image: url('https://pbs.twimg.com/media/FmR75p8aAAAhcPX?format=jpg&name=4096x4096');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+            position: absolute;
+        }
+
+        div#header-bg {
+            background-color: rgb(245, 140, 132);
+            width: 4000px;
+            height: 600px;
+            position: absolute;
+        }
+
+        div#header-gradient {
+            background: linear-gradient(to bottom, rgba(245, 140, 132, 1), rgba(245, 140, 132, 0));
+            width: 4000px;
+            height: 1200px;
+            position: absolute;
+            top: 600px
+        }
+
+
+        div#container>* {
+            position: absolute;
+            z-index: 1000;
+            transform: translate(0px, -50%);
+            display: inline-block;
+        }
+
+        div#profile {
+            height: 7%;
+            top: 20%;
+            left: 7.25%;
+            width: 20%;
+        }
+
+        div#username {
+            display: inline-block;
+            font-family: 'Josefin Sans', sans-serif;
+            font-style: italic;
+            font-size: 2em;
+            transform: translate(0px, -20%);
+            max-width: 70%;
+            /* overflow: hidden; */
+            overflow-x: hidden;
+            word-wrap: initial;
+
+        }
+
+        div#avatar {
+            display: inline-block;
+            border-radius: 9999px;
+            border: solid 0px transparent;
+            overflow: hidden;
+            height: 100%;
+            aspect-ratio: 1 / 1;
+        }
+
+        div#avatar>img {
+            width: 100%;
+            height: 100%;
+        }
+
+        div#main-stat {
+            top: 20%;
+            left: 32.75%;
+            display: grid;
+            grid-template-columns: 22% 22% 22% 22%;
+            grid-column-gap: 4%;
+            width: 60%;
+        }
+
+        .bg {
+            background-color: rgba(255, 255, 255, 1);
+            box-shadow: 0 7px 15px 0 rgba(0, 0, 0, .13), 0 1px 4px 0 rgba(0, 0, 0, .11);
+            backdrop-filter: blur(160px);
+            background-image: linear-gradient(156deg, rgba(102, 223, 239, 0.13), rgba(78, 25, 153, 0.041));
+            padding: 1em;
+            border: 0px;
+            border-radius: .7em;
+        }
+
+        div.stat {
+            text-align: center;
+            display: grid;
+            grid-template:
+                'hd' 35%
+                'nb' 65% / 100%;
+        }
+
+        div.stat-header {
+            display: grid;
+            align-items: flex-end;
+            font-family: 'Josefin Sans', sans-serif;
+            font-style: italic;
+            font-size: .8em;
+            grid-area: hd;
+        }
+
+        div.stat-number {
+            display: grid;
+            align-items: flex-start;
+            font-family: 'Secular One', sans-serif;
+            font-size: 1.7em;
+            grid-area: nb;
+        }
+
+        div#detail {
+            width: 35%;
+            height: 60%;
+            right: 7.25%;
+            top: 30%;
+            transform: translate(0px, 0px);
+            display: grid;
+            grid-template:
+                '. . d' 4%
+                '. a e' 9%
+                '. a e' 14.67%
+                '. b e' 26.67%
+                '. c e' 26.67%
+                '. . e' 4% / 2% 40% 44%;
+            grid-row-gap: 3%;
+            grid-column-gap: 7%;
+        }
+
+        div#legend-name {
+            display: grid;
+            text-align: center;
+            font-family: 'Josefin Sans', sans-serif;
+            font-style: italic;
+            align-items: center;
+            font-size: 1.5em;
+            transform: translate(0px, 30%);
+        }
+
+        div#legend-portrait {
+            overflow: hidden;
+            display: grid;
+            justify-items: center;
+            grid-template: '.' 100% / 100%;
+        }
+
+        div#legend-portrait>img {
+            height: 100%;
+        }
+
+        .au-bg {
+            background-image: linear-gradient(156deg, rgba(255, 215, 0, 0.08), rgba(253, 243, 186, 0.11));
+        }
+
+        .area-a {
+            grid-area: a;
+        }
+
+        .area-b {
+            grid-area: b;
+        }
+
+        .area-c {
+            grid-area: c;
+        }
+
+        .area-d {
+            grid-area: d;
+        }
+
+        .area-e {
+            grid-area: e;
+        }
+
+        .area-f {
+            grid-area: f;
+        }
+
+        .area-g {
+            grid-area: g;
+        }
+
+        div#rank {
+            width: 41.5%;
+            height: 60%;
+            left: 7.25%;
+            top: 30%;
+            transform: translate(0px, 0px);
+            display: grid;
+            grid-template:
+                'a' 49%
+                'b' .5%
+                'c' 49% / 100%;
+            grid-gap: 0.75%;
+        }
+
+        div.separate-line {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgb(190, 190, 171), transparent);
+            /* background-color: rgb(92, 92, 92); */
+        }
+
+        div#rank .rank-container {
+            display: grid;
+            grid-template:
+                '. . .' 20%
+                'a . e' 10%
+                'b d f' 40%
+                'c . g' 10%
+                '. . .' 20% / 30% 40% 30%;
+            align-items: center;
+            justify-items: center;
+            text-align: center;
+        }
+
+        div#rank .rank-container>.rank-image {
+            height: 100%;
+        }
+
+        div#rank .rank-container>.rank-image>img {
+            height: 100%;
+        }
+
+        div#rank .rank-container>.rank-title {
+            font-family: 'Josefin Sans', sans-serif;
+            font-style: italic;
+        }
+
+        div#rank .rank-container>.rank-point {
+            font-family: 'Secular One', sans-serif;
+        }
+
+        .title-font {
+            font-family: 'Josefin Sans', sans-serif;
+            font-style: italic;
+        }
+
+        .body-font {
+            font-family: 'Secular One', sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="profile" class="bg">
+            <div id="avatar"><img src="${user_avatar_url}" class="avatar"></div>
+            <div id="username">${username}</div>
+        </div>
+        <div id="main-stat">
+            <div class="stat bg">
+                <div class="stat-header">${stat_header_1}</div>
+                <div class="stat-number">${stat_number_1}</div>
+            </div>
+            <div class="stat bg">
+                <div class="stat-header">${stat_header_2}</div>
+                <div class="stat-number">${stat_number_2}</div>
+            </div>
+            <div class="stat bg">
+                <div class="stat-header">${stat_header_3}</div>
+                <div class="stat-number">${stat_number_3}</div>
+            </div>
+            <div class="stat bg">
+                <div class="stat-header">${stat_header_4}</div>
+                <div class="stat-number">${stat_number_4}</div>
+            </div>
+        </div>
+        <div id="rank" class="bg">
+            <div id="battle-royale" class="rank-container">
+                <div class="rank-title area-a">Current Rank</div>
+                <div class="rank-image area-b">
+                    <img src="${br_current_rank_image}" />
+                </div>
+                <div class="rank-point area-c">${br_current_rank_number} rp</div>
+                <div class="points-to-next-rank area-d">
+                    <span class="body-font" style="font-size: 1.3em;">${br_point_until_next_rank} rp</span><br>
+                    <span class="title-font">${br_until}</span><br>
+                    <span class="title-font">Apex Predator</span>
+                </div>
+                <div class="rank-title area-e">Predator</div>
+                <div class="rank-image area-f">
+                    <img src="${br_next_rank_image}" />
+                </div>
+                <div class="rank-point area-g">${br_next_rank_number} rp</div>
+            </div>
+            <div class="separate-line"></div>
+            <div id="battle-royale" class="rank-container">
+                <div class="rank-title area-a">Current Rank</div>
+                <div class="rank-image area-b">
+                    <img src="${ar_current_rank_image}" />
+                </div>
+                <div class="rank-point area-c">${ar_current_rank_number} ap</div>
+                <div class="points-to-next-rank area-d">
+                    <span class="body-font" style="font-size: 1.3em;">${ar_point_until_next_rank} ap</span><br>
+                    <span class="title-font">${ar_until}</span><br>
+                    <span class="title-font">Apex Predator</span>
+                </div>
+                <div class=" rank-title area-e">Predator
+                </div>
+                <div class="rank-image area-f">
+                    <img src="${ar_next_rank_image}" />
+                </div>
+                <div class="rank-point area-g">${ar_next_rank_number} ap</div>
+            </div>
+        </div>
+        <div id="detail" class="bg">
+            <div class="stat bg area-a au-bg">
+                <div class="stat-header">${detail_header_1}</div>
+                <div class="stat-number">${detail_number_1}</div>
+            </div>
+            <div class="stat bg area-b au-bg">
+                <div class="stat-header">${detail_header_2}</div>
+                <div class="stat-number">${detail_number_2}</div>
+            </div>
+            <div class="stat bg area-c au-bg">
+                <div class="stat-header">${detail_header_3}</div>
+                <div class="stat-number">${detail_number_3}</div>
+            </div>
+            <div id="legend-name" class="area-d">
+                ${detail_legend_name}
+            </div>
+            <div id="legend-portrait" class="area-e">
+                <img src="${detail_legend_image}" />
+            </div>
+        </div>
+    </div>
+    <div id="header-bg"></div>
+    <div id="header-gradient"></div>
+</body>
+
+</html>

@@ -104,3 +104,9 @@ dist
 .tern-port
 
 src/configs/auth*
+
+src/commands/apex/lib/data
+
+.DS_Store
+
+package-lock.json

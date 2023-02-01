@@ -4,7 +4,8 @@
   "description": "KOOK Apex stats bot",
   "main": "src/index.ts",
   "scripts": {
-    "start": "node --nolazy -r ts-node/register -r tsconfig-paths/register src/index.ts"
+    "start": "node --nolazy -r ts-node/register -r tsconfig-paths/register src/index.ts",
+    "pm2": "pm2 start src/pm2-windows.js"
   },
   "repository": {
     "type": "git",
@@ -15,7 +16,7 @@
     "kaiheila",
     "bot"
   ],
-  "author": "FlappyIce",
+  "author": "Hexona",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Hexona69/kook-apex-chan/issues"

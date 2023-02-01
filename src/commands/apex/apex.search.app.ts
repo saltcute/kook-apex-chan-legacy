@@ -48,7 +48,7 @@ class ApexSearch extends AppCommand {
                 let ar_predator = await this.apexClient.getPredatorRequirement('AP', platform);
                 let formater = Intl.NumberFormat('en-US', {
                     notation: 'compact',
-                    maximumFractionDigits: 3
+                    maximumFractionDigits: 2
                 });
 
                 let stat = user.segments[0].stats;

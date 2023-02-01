@@ -53,6 +53,12 @@ class ApexSearch extends AppCommand {
 
                 let stat = user.segments[0].stats;
                 let legend = user.segments[1];
+                for (let segment of user.segments) {
+                    if (segment.type == 'legend' && segment.metadata.isActive) {
+                        legend = segment;
+                        break;
+                    }
+                }
                 let detail_header_1, detail_number_1, detail_header_2, detail_number_2, detail_header_3, detail_number_3;
                 detail_header_1 = detail_number_1 = detail_header_2 = detail_number_2 = detail_header_3 = detail_number_3 = '';
                 for (let key in legend.stats) {

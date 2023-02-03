@@ -1,7 +1,19 @@
 import axios, { AxiosInstance } from 'axios';
 import upath from 'upath';
 import mcache from 'memory-cache';
-import { StrategyEnum } from 'sharp';
+import * as fs from 'fs';
+
+export let humanToTrackerGG: {
+    [key: string]: "xbl" | "psn" | "origin"
+} = {
+    origin: 'origin',
+    psn: 'psn',
+    ps: 'psn',
+    xbox: 'xbl',
+    xbl: 'xbl',
+    playstation: 'psn',
+    pc: 'origin'
+}
 
 namespace segement {
     export type stat = {
@@ -127,11 +139,27 @@ namespace predator {
     }
 }
 
-export default class Apex {
+export type connection = {
+    origin?: {
+        username: string,
+        timestamp: number
+    },
+    psn?: {
+        username: string,
+        timestamp: number
+    },
+    xbl?: {
+        username: string,
+        timestamp: number
+    }
+}
+
+export class Apex {
     private trackergg_token: string;
     private als_token: string;
     private _requestor_gg: AxiosInstance;
     private _requestor_als: AxiosInstance;
+    private connection_map: Map<string, connection> = new Map();
     public static defaultRankImage = 'https://trackercdn.com/cdn/apex.tracker.gg/ranks/bronze4.png';
     public static predatorRankImage = 'https://trackercdn.com/cdn/apex.tracker.gg/ranks/apex.png';
     constructor(trackergg_token: string, als_token: string) {
@@ -149,6 +177,30 @@ export default class Apex {
                 auth: this.als_token
             }
         })
+
+        this.readConnectionMap();
+    }
+
+    readConnectionMap() {
+        let connect_data = this._readJSON(upath.join(__dirname, 'data', 'connection.json'));
+        if (connect_data) this.connection_map = new Map(Object.entries(connect_data));
+    }
+
+    writeConnectionMap() {
+        this._writeJSON(upath.join(__dirname, 'data', 'connection.json'), Object.fromEntries(this.connection_map));
+    }
+
+    _readJSON(path: string): any | undefined {
+        try {
+            return JSON.parse(fs.readFileSync(path, { encoding: 'utf-8', flag: 'r' }));
+        } catch (e) {
+            return undefined;
+        }
+    }
+    _writeJSON(path: string, data: any): void {
+        let dir = upath.dirname(path);
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(path, JSON.stringify(data));
     }
     getCache(keyp: string[]): Promise<any | undefined> {
         let key = keyp.join('');
@@ -183,6 +235,31 @@ export default class Apex {
             return data;
         }
     }
+    public getConnection(platform: 'origin' | 'psn' | 'xbl', kookUserId: string) {
+        let connection = this.connection_map.get(kookUserId);
+        if (connection) return connection[platform];
+        else return undefined;
+    }
+    public connectPlatform(platform: 'origin' | 'psn' | 'xbl', username: string, kookUserId: string) {
+        let connection = this.connection_map.get(kookUserId);
+        if (connection) {
+            connection[platform] = {
+                username,
+                timestamp: Date.now()
+            }
+        } else {
+            this.connection_map.set(kookUserId, {
+                [platform]: {
+                    username,
+                    timestamp: Date.now()
+                }
+            })
+        }
+    }
+    public disconnectPlatform(platform: 'origin' | 'psn' | 'xbl', kook_userId: string) {
+        let connection = this.connection_map.get(kook_userId);
+        if (connection) connection[platform] = undefined;
+    }
     public async getPlayerDetail(platform: 'origin' | 'psn' | 'xbl', username: string): Promise<userDetail> {
         return this.cache(['player_detail', platform, username], async () => {
             return this.requestor_gg(upath.join('v2', 'apex', 'standard', 'profile', platform, username))
@@ -202,4 +279,10 @@ export default class Apex {
                 .catch((e) => { console.log(e); throw e });
         })
     }
+}
+
+let apex: Apex
+export default (trackergg_token: string, als_token: string) => {
+    if (!apex) apex = new Apex(trackergg_token, als_token);
+    return apex;
 }

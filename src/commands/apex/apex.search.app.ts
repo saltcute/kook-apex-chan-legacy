@@ -1,22 +1,9 @@
 import { AppCommand, AppFunc, BaseSession, Card } from 'kbotify';
 import auth from 'configs/auth';
-import Apex from './lib/apex';
+import apex, { Apex, humanToTrackerGG } from './lib/apex';
 import { generateImage } from 'commands/apex/lib/drawer';
 import { bot } from 'init/client';
 import sharp from 'sharp';
-
-
-let map: {
-    [key: string]: "xbl" | "psn" | "origin"
-} = {
-    origin: 'origin',
-    psn: 'psn',
-    ps: 'psn',
-    xbox: 'xbl',
-    xbl: 'xbl',
-    playstation: 'psn',
-    pc: 'origin'
-}
 
 class ApexSearch extends AppCommand {
     code = 'search'; // 只是用作标记
@@ -26,7 +13,7 @@ class ApexSearch extends AppCommand {
     apexClient: Apex;
     constructor() {
         super();
-        this.apexClient = new Apex(auth.trackerggKey, auth.alsKey)
+        this.apexClient = apex(auth.trackerggKey, auth.alsKey)
     }
     func: AppFunc<BaseSession> = async (session) => {
         let ts = Date.now();
@@ -34,13 +21,16 @@ class ApexSearch extends AppCommand {
         let username = session.args[0];
         let plat = session.args[1];
         let platform: "xbl" | "psn" | "origin" = 'origin';
+        if (humanToTrackerGG[plat]) {
+            platform = humanToTrackerGG[plat];
+        }
         if (!username) {
-            return session.reply('请输入用户名');
+            let connection = this.apexClient.getConnection(platform, session.userId);
+            if (connection) {
+                username = connection.username;
+            } else return session.reply('您还未绑定！请先绑定或输入用户名');
         }
         let messageId = (await session.sendCard(new Card().addText('正在加载……请稍候'))).msgSent?.msgId || '';
-        if (map[plat]) {
-            platform = map[plat];
-        }
         return this.apexClient.getPlayerDetail(platform, username)
             .then(async (user) => {
                 bot.logger.debug('Generation: Recieved data from remote API');
@@ -143,7 +133,7 @@ class ApexSearch extends AppCommand {
                 console.log(`Generation time: ${Date.now() - ts}ms`);
             }).catch((e) => {
                 console.log(e);
-                session.reply(`无法找到名为 ${username} 的 ${platform} 用户`);
+                session.updateMessage(messageId, new Card().addText(`获取名为 ${username} 的 ${platform} 用户的资料失败\n此用户可能不存在，请检查输入`).toString());
             });
     }
 }

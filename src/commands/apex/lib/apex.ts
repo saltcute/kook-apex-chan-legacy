@@ -2,17 +2,18 @@ import axios, { AxiosInstance } from 'axios';
 import upath from 'upath';
 import mcache from 'memory-cache';
 import * as fs from 'fs';
+import auth from 'configs/auth';
 
 export let humanToTrackerGG: {
-    [key: string]: "xbl" | "psn" | "origin"
+    [key: string]: 'PC' | 'PS4' | 'X1'
 } = {
-    origin: 'origin',
-    psn: 'psn',
-    ps: 'psn',
-    xbox: 'xbl',
-    xbl: 'xbl',
-    playstation: 'psn',
-    pc: 'origin'
+    origin: 'PC',
+    psn: 'PS4',
+    ps: 'PS4',
+    xbox: 'X1',
+    xbl: 'X1',
+    playstation: 'PS4',
+    pc: 'PC'
 }
 
 namespace segement {
@@ -80,7 +81,7 @@ namespace segement {
     }
 }
 
-type userDetail = {
+interface userDetailGG {
     platformInfo: {
         platformSlug: 'origin' | 'xbl' | 'psn',
         platformUserId: string,
@@ -119,6 +120,95 @@ type userDetail = {
     expiryDate: string,
 };
 
+interface userDetail {
+    global: {
+        name: string,
+        uid: number,
+        avatar: string,
+        platform: string,
+        level: number,
+        toNextLevelPercent: number,
+        internalUpdateCount: number,
+        bans: {
+            isActive: boolean,
+            remainingSeconds: number,
+            last_banReason: string
+        },
+        rank: {
+            rankScore: number,
+            rankName: string,
+            ranDiv: number,
+            ladderPosPlatform: number,
+            rankImg: string,
+            rankedSeason: string
+        },
+        arena: {
+            rankScore: number,
+            rankName: string,
+            rankDiv: number,
+            ladderPosPlatform: number,
+            rankImg: string,
+            rankedSeason: string
+        },
+        battlepass: {
+            level: number,
+            history: {
+                [key: string]: number
+            }
+        },
+        internalParsingVersion: number,
+        badges: {
+            name: string,
+            value: number
+        }[],
+        levelPrestige: number
+    },
+    realtime: {
+        lobbyState: string,
+        isOnline: 0 | 1,
+        isInGame: 0 | 1,
+        canJoin: 0 | 1,
+        partyFull: 0 | 1,
+        selectedLegend: string,
+        currentState: string,
+        currentStateSinceTimestamp: number,
+        currentStateAsText: string
+    },
+    legends: {
+        selected: {
+            LegendName: string,
+            data: {
+                name: string,
+                value: number,
+                key: string,
+                global: boolean
+            }[],
+            gameInfo: {
+                skin: string,
+                skinRariry: string,
+                frame: string,
+                frameRarity: string,
+                pose: string,
+                poseRarity: string,
+                intro: string,
+                introRarity: string,
+                badge: {
+                    name: string,
+                    value: number,
+                    category: string
+                }[]
+            }
+        },
+        ImgAssets: {
+            icon: string,
+            banner: string
+        }
+    }
+    all: {
+        [key: string]: any
+    }
+}
+
 namespace predator {
     export type requirement = {
         foundRank: number,
@@ -140,15 +230,15 @@ namespace predator {
 }
 
 export type connection = {
-    origin?: {
+    PC?: {
         username: string,
         timestamp: number
     },
-    psn?: {
+    PS4?: {
         username: string,
         timestamp: number
     },
-    xbl?: {
+    X1?: {
         username: string,
         timestamp: number
     }
@@ -219,9 +309,10 @@ export class Apex {
             return res.data
         }).catch((e) => { console.log(e); throw e; })
     }
-    private async requestor_als(endpoint: string) {
+    private async requestor_als(endpoint: string, params?: any) {
         return this._requestor_als({
-            url: endpoint
+            url: endpoint,
+            params
         }).then((res) => {
             return res.data
         }).catch((e) => { console.log(e); throw e; })
@@ -235,12 +326,12 @@ export class Apex {
             return data;
         }
     }
-    public getConnection(platform: 'origin' | 'psn' | 'xbl', kookUserId: string) {
+    public getConnection(platform: 'PC' | 'PS4' | 'X1', kookUserId: string) {
         let connection = this.connection_map.get(kookUserId);
         if (connection) return connection[platform];
         else return undefined;
     }
-    public connectPlatform(platform: 'origin' | 'psn' | 'xbl', username: string, kookUserId: string) {
+    public connectPlatform(platform: 'PC' | 'PS4' | 'X1', username: string, kookUserId: string) {
         let connection = this.connection_map.get(kookUserId);
         if (connection) {
             connection[platform] = {
@@ -256,26 +347,29 @@ export class Apex {
             })
         }
     }
-    public disconnectPlatform(platform: 'origin' | 'psn' | 'xbl', kook_userId: string) {
+    public disconnectPlatform(platform: 'PC' | 'PS4' | 'X1', kook_userId: string) {
         let connection = this.connection_map.get(kook_userId);
         if (connection) connection[platform] = undefined;
     }
-    public async getPlayerDetail(platform: 'origin' | 'psn' | 'xbl', username: string): Promise<userDetail> {
+    /*
+    public async getPlayerDetail(platform: 'PC' | 'PS4' | 'X1', username: string): Promise<userDetail> {
         return this.cache(['player_detail', platform, username], async () => {
             return this.requestor_gg(upath.join('v2', 'apex', 'standard', 'profile', platform, username))
                 .then((res) => { return res.data; })
                 .catch((e) => { console.log(e); throw e });
         })
+    }*/
+    public async getPlayerDetail(platform: 'PC' | 'PS4' | 'X1', username: string): Promise<userDetail> {
+        return this.cache(['player_detail', platform, username], async () => {
+            return this.requestor_als(upath.join('bridge'), { auth: auth.alsKey, player: username, platform })
+                .then((res) => { return res; })
+                .catch((e) => { console.log(e); throw e });
+        });
     }
-    public async getPredatorRequirement(type: 'RP' | 'AP', platform: 'origin' | 'psn' | 'xbl'): Promise<predator.requirement> {
-        let map: { [key: string]: 'PC' | 'PS4' | 'X1' } = {
-            origin: 'PC',
-            psn: 'PS4',
-            xbl: 'X1'
-        }
+    public async getPredatorRequirement(type: 'RP' | 'AP', platform: 'PC' | 'PS4' | 'X1'): Promise<predator.requirement> {
         return this.cache(['predator_requirement', type, platform], async () => {
             return this.requestor_als('predator')
-                .then((res: predator.data) => { return res[type][map[platform]]; })
+                .then((res: predator.data) => { return res[type][platform]; })
                 .catch((e) => { console.log(e); throw e });
         })
     }

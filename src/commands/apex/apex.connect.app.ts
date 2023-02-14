@@ -16,7 +16,7 @@ class ApexConnect extends AppCommand {
     func: AppFunc<BaseSession> = async (session) => {
         let username = session.args[0];
         let plat = session.args[1];
-        let platform: "xbl" | "psn" | "origin" = 'origin';
+        let platform: 'PC' | 'PS4' | 'X1' = 'PC';
         if (!username) {
             return session.reply('请输入用户名');
         }

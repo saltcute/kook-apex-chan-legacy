@@ -1,10 +1,9 @@
 import { apexConnect } from 'commands/apex/apex.connect.app';
 import { apexSearch } from 'commands/apex/apex.search.app';
 import { bot } from 'init/client';
-import { TextMessage } from 'kbotify';
 import { apexMenu } from './commands/apex/apex.menu';
 
-bot.addCommands(apexMenu);
+bot.plugin.load(apexMenu);
 
 bot.connect();
 
@@ -18,17 +17,16 @@ function getMatches(string: string, regex: RegExp): string[] {
     }
     return res;
 }
-bot.on('kmarkdownMessage', (event) => {
-    const text = new TextMessage(event, bot);
+bot.message.on('allTextMessages', (event) => {
     switch (true) {
         case /^绑定(origin|pc|xbl|xbox|psn|ps)? ?(.+)$/.test(event.content): {
             const [platform, username] = getMatches(event.content, /^绑定(origin|pc|xbl|xbox|psn|ps)? ?(.+)$/);
-            apexConnect.exec('connect', [username, platform], text);
+            apexConnect.exec([username, platform], event, bot);
             break;
         };
         case /^查[询找](origin|pc|xbl|xbox|psn|ps)? ?(.+)?$/.test(event.content): {
             const [platform, username] = getMatches(event.content, /^查[询找](origin|pc|xbl|xbox|psn|ps)? ?(.+)?$/);
-            apexSearch.exec('search', [username, platform], text);
+            apexSearch.exec([username, platform], event, bot);
             break;
         }
     }

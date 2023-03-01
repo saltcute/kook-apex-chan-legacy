@@ -1,28 +1,27 @@
-import { AppCommand, AppFunc, BaseSession, Card } from 'kbotify';
+import { BaseCommand, CommandFunction, BaseSession, Card } from 'kasumi.js';
 import auth from 'configs/auth';
 import apex, { Apex, humanToTrackerGG } from './lib/apex';
 import { generateImage } from 'commands/apex/lib/drawer';
 import { bot } from 'init/client';
 import sharp from 'sharp';
 
-class ApexSearch extends AppCommand {
-    code = 'search'; // 只是用作标记
-    trigger = 'search'; // 用于触发的文字
-    help = '';
-    intro = '';
+class ApexSearch extends BaseCommand {
+    name = 'search';
+    description = '搜索用户';
+
     apexClient: Apex;
     constructor() {
         super();
         this.apexClient = apex(auth.trackerggKey, auth.alsKey)
     }
-    func: AppFunc<BaseSession> = async (session) => {
+    func: CommandFunction<BaseSession, any> = async (session) => {
         let ts = Date.now();
         console.log(`Start: ${ts}`);
         let username = session.args[0];
         let plat = session.args[1];
         let platform: 'PC' | 'PS4' | 'X1' = 'PC';
         if (!username) {
-            let connection = this.apexClient.getConnection(platform, session.userId);
+            let connection = this.apexClient.getConnection(platform, session.authorId);
             if (connection) {
                 username = connection.username;
             } else return session.reply('您还未绑定！请先绑定或输入用户名');
@@ -30,7 +29,8 @@ class ApexSearch extends AppCommand {
         if (humanToTrackerGG[plat]) {
             platform = humanToTrackerGG[plat];
         }
-        let messageId = (await session.sendCard(new Card().addText('正在加载……请稍候'))).msgSent?.msgId || '';
+        let message = (await session.send(new Card().addText('正在加载……请稍候')));
+        let messageId = message ? message.msg_id : '';
         return this.apexClient.getPlayerDetail(platform, username)
             .then(async (user) => {
                 bot.logger.debug('Generation: Recieved data from remote API');
@@ -102,18 +102,14 @@ class ApexSearch extends AppCommand {
                 buffer = await sharp(buffer).jpeg().toBuffer();
                 let url = (await bot.API.asset.create(buffer, { filename: 'image.jpg' })).url;
                 bot.logger.debug('Generation: Present image to user');
-                session.updateMessage(messageId, new Card().addText(`查询成功，本次用时：(font)${(Date.now() - ts) / 1000}s(font)[${Date.now() - ts > 6657 ? Date.now() - ts > 8964 ? 'danger' : 'warning' : 'success'}]`).addModule(<any>{
-                    type: "container",
-                    elements: [{
-                        "type": "image",
-                        "src": url
-                    }]
-                }).toString());
+                session.update(messageId, new Card()
+                    .addText(`查询成功，本次用时：(font)${(Date.now() - ts) / 1000}s(font)[${Date.now() - ts > 6657 ? Date.now() - ts > 8964 ? 'danger' : 'warning' : 'success'}]`)
+                    .addImage(url));
                 console.log(`End: ${Date.now()}`);
                 console.log(`Generation time: ${Date.now() - ts}ms`);
             }).catch((e) => {
-                console.log(e);
-                session.updateMessage(messageId, new Card().addText(`获取名为 ${username} 的 ${platform} 用户的资料失败\n此用户可能不存在，请检查输入`).toString());
+                // console.log(e);
+                session.update(messageId, new Card().addText(`获取名为 ${username} 的 ${platform} 用户的资料失败\n此用户可能不存在，请检查输入`).toString());
             });
     }
 }

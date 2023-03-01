@@ -1,6 +1,6 @@
 {
   "name": "kook-apex-chan",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "KOOK Apex stats bot",
   "main": "src/index.ts",
   "scripts": {
@@ -12,7 +12,8 @@
     "url": "git+https://github.com/Hexona69/kook-apex-chan.git"
   },
   "keywords": [
-    "kbotify",
+    "kasumi",
+    "kook",
     "kaiheila",
     "bot"
   ],

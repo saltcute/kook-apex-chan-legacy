@@ -16,7 +16,8 @@ class ApexSearch extends BaseCommand {
     }
     func: CommandFunction<BaseSession, any> = async (session) => {
         let ts = Date.now();
-        console.log(`Start: ${ts}`);
+        let last_ts = ts;
+        this.logger.info(`Start generation: ${ts}`);
         let username = session.args[0];
         let plat = session.args[1];
         let platform: 'PC' | 'PS4' | 'X1' = 'PC';
@@ -30,10 +31,14 @@ class ApexSearch extends BaseCommand {
             platform = humanToTrackerGG[plat];
         }
         let message = (await session.send(new Card().addText('正在加载……请稍候')));
+        this.logger.info(`Sent initial message, processing time ${Date.now() - last_ts}ms`);
+        last_ts = Date.now();
         let messageId = message ? message.msg_id : '';
         return this.apexClient.getPlayerDetail(platform, username)
             .then(async (user) => {
-                bot.logger.debug('Generation: Recieved data from remote API');
+                this.logger.info(`Got player stat, processing time ${Date.now() - last_ts}ms`);
+                last_ts = Date.now();
+                this.logger.debug('Generation: Recieved data from remote API');
                 let br_predator = await this.apexClient.getPredatorRequirement('RP', platform);
                 let ar_predator = await this.apexClient.getPredatorRequirement('AP', platform);
                 let formater = Intl.NumberFormat('en-US', {
@@ -63,7 +68,7 @@ class ApexSearch extends BaseCommand {
                 stat_number_3 = stat.bans.isActive ? `${formater.format(stat.bans.remainingSeconds)}s` : "None";
                 stat_header_4 = "Platform";
                 stat_number_4 = stat.platform;
-                bot.logger.debug('Generation: Start generation');
+                this.logger.debug('Generation: Start generation');
                 let buffer = await generateImage({
                     username: user.global.name,
                     user_avatar_url: user.global.avatar || "https://img.kookapp.cn/assets/2022-07/vlOSxPNReJ0dw0dw.jpg",
@@ -98,15 +103,23 @@ class ApexSearch extends BaseCommand {
                     detail_header_3,
                     detail_number_3
                 });
-                bot.logger.debug('Generation: Start uploading');
+
+                this.logger.info(`Generated image, processing time ${Date.now() - last_ts}ms`);
+                last_ts = Date.now();
+                this.logger.debug('Generation: Start uploading');
                 buffer = await sharp(buffer).jpeg().toBuffer();
                 let url = (await bot.API.asset.create(buffer, { filename: 'image.jpg' })).url;
-                bot.logger.debug('Generation: Present image to user');
-                session.update(messageId, new Card()
+
+                this.logger.info(`Uploaded image, processing time ${Date.now() - last_ts}ms`);
+                last_ts = Date.now();
+                this.logger.debug('Generation: Present image to user');
+                await session.update(messageId, new Card()
                     .addText(`查询成功，本次用时：(font)${(Date.now() - ts) / 1000}s(font)[${Date.now() - ts > 6657 ? Date.now() - ts > 8964 ? 'danger' : 'warning' : 'success'}]`)
                     .addImage(url));
-                console.log(`End: ${Date.now()}`);
-                console.log(`Generation time: ${Date.now() - ts}ms`);
+                this.logger.info(`Sent message, processing time ${Date.now() - last_ts}ms`);
+                last_ts = Date.now();
+                this.logger.info(`End: ${Date.now()}`);
+                this.logger.info(`Generation time: ${Date.now() - ts}ms`);
             }).catch((e) => {
                 // console.log(e);
                 session.update(messageId, new Card().addText(`获取名为 ${username} 的 ${platform} 用户的资料失败\n此用户可能不存在，请检查输入`).toString());

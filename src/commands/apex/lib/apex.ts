@@ -363,14 +363,14 @@ export class Apex {
         return this.cache(['player_detail', platform, username], async () => {
             return this.requestor_als(upath.join('bridge'), { auth: auth.alsKey, player: username, platform })
                 .then((res) => { return res; })
-                .catch((e) => { console.log(e); throw e });
-        });
+                .catch((e) => { throw e });
+        }).catch(e => { throw e });
     }
     public async getPredatorRequirement(type: 'RP' | 'AP', platform: 'PC' | 'PS4' | 'X1'): Promise<predator.requirement> {
         return this.cache(['predator_requirement', type, platform], async () => {
             return this.requestor_als('predator')
                 .then((res: predator.data) => { return res[type][platform]; })
-                .catch((e) => { console.log(e); throw e });
+                .catch((e) => { throw e });
         })
     }
 }

@@ -108,8 +108,8 @@ class ApexSearch extends BaseCommand {
                 last_ts = Date.now();
                 this.logger.debug('Generation: Start uploading');
                 buffer = await sharp(buffer).jpeg().toBuffer();
-                let url = (await bot.API.asset.create(buffer, { filename: 'image.jpg' })).url;
-
+                let url = (await bot.API.asset.create(buffer, { filename: 'image.jpg' }))?.url;
+                if (!url) throw new Error('Cannot upload image');
                 this.logger.info(`Uploaded image, processing time ${Date.now() - last_ts}ms`);
                 last_ts = Date.now();
                 this.logger.debug('Generation: Present image to user');

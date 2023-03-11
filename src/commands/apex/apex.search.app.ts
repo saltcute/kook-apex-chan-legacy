@@ -122,7 +122,7 @@ class ApexSearch extends BaseCommand {
                 this.logger.info(`Generation time: ${Date.now() - ts}ms`);
             }).catch((e) => {
                 // console.log(e);
-                session.update(messageId, new Card().addText(`获取名为 ${username} 的 ${platform} 用户的资料失败\n此用户可能不存在，请检查输入`).toString());
+                session.update(messageId, new Card().addText(`获取名为 ${username} 的 ${platform} 用户的资料失败\n此用户可能不存在，请检查输入`));
             });
     }
 }

@@ -25,7 +25,7 @@
   "homepage": "https://github.com/Hexona69/kook-apex-chan#readme",
   "dependencies": {
     "axios": "^1.3.0",
-    "kasumi.js": "^0.1.9",
+    "kasumi.js": "^0.1.16",
     "kbotify": "^0.2.5",
     "memory-cache": "^0.2.0",
     "puppeteer": "^19.6.2",

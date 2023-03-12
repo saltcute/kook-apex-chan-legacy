@@ -36,7 +36,7 @@ bot.message.on('allTextMessages', (event) => {
 
 bot.logger.debug('system init success');
 
-botMarketStayOnline();
+if (auth.useBotMarket) botMarketStayOnline();
 function botMarketStayOnline() {
     axios({
         url: 'http://bot.gekj.net/api/v1/online.bot',

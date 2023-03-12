@@ -4,5 +4,8 @@ export default {
     khltoken: 'token here',
     khlverify: 'verify token here',
     trackerggKey: '',
-    alsKey: ''
+    alsKey: '',
+
+    useBotMarket: false,
+    botMarketUUID: ' '
 };

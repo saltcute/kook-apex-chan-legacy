@@ -3,6 +3,6 @@ import auth from '../configs/auth';
 
 export const bot = new Kasumi({
     type: 'websocket',
-    vendor: 'botroot',
+    // vendor: 'botroot',
     token: auth.khltoken
 });

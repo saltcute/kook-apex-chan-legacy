@@ -43,7 +43,7 @@ class ApexSearch extends BaseCommand {
                 }
                 // console.dir(user, { depth: 1 });
                 this.logger.info(`Got player stat, processing time ${Date.now() - last_ts}ms`);
-                session.update(messageId, new Card()
+                await session.update(messageId, new Card()
                     .addText(`已获取用户资料，耗时 (font)${(Date.now() - last_ts) / 1000}s(font)[${Date.now() - last_ts > 1500 ? Date.now() - ts > 3000 ? 'danger' : 'warning' : 'success'}]`));
                 last_ts = Date.now();
                 this.logger.debug('Generation: Recieved data from remote API');
@@ -113,7 +113,7 @@ class ApexSearch extends BaseCommand {
                 });
 
                 this.logger.info(`Generated image, processing time ${Date.now() - last_ts}ms`);
-                session.update(messageId, new Card()
+                await session.update(messageId, new Card()
                     .addText(`已生成图像，耗时 (font)${(Date.now() - last_ts) / 4000}s(font)[${Date.now() - last_ts > 6000 ? Date.now() - ts > 3000 ? 'danger' : 'warning' : 'success'}]`));
                 last_ts = Date.now();
                 this.logger.debug('Generation: Start uploading');
@@ -123,7 +123,7 @@ class ApexSearch extends BaseCommand {
                 let url = data.url;
                 if (!url) throw new Error('Cannot upload image');
                 this.logger.info(`Uploaded image, processing time ${Date.now() - last_ts}ms`);
-                session.update(messageId, new Card()
+                await session.update(messageId, new Card()
                     .addText(`已上传图像，耗时 (font)${(Date.now() - last_ts) / 1000}s(font)[${Date.now() - last_ts > 1500 ? Date.now() - ts > 3000 ? 'danger' : 'warning' : 'success'}]`));
                 last_ts = Date.now();
                 this.logger.debug('Generation: Present image to user');

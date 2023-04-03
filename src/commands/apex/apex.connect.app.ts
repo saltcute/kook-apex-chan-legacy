@@ -33,7 +33,7 @@ class ApexConnect extends BaseCommand {
                 }
                 this.apexClient.connectPlatform(platform, username, session.authorId);
                 this.apexClient.writeConnectionMap();
-                session.update(messageId, new Card().addText(`绑定成功！`));
+                await session.update(messageId, new Card().addText(`绑定成功！`));
                 let ses = session;
                 ses.args = [username, platform];
                 apexSearch.exec(ses);

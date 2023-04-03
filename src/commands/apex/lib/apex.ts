@@ -120,6 +120,10 @@ interface userDetailGG {
     expiryDate: string,
 };
 
+interface error {
+    Error: string;
+}
+
 interface userDetail {
     global: {
         name: string,
@@ -359,7 +363,11 @@ export class Apex {
                 .catch((e) => { console.log(e); throw e });
         })
     }*/
-    public async getPlayerDetail(platform: 'PC' | 'PS4' | 'X1', username: string): Promise<userDetail> {
+    isError(payload: any): payload is error {
+        return typeof payload.Error == 'string';
+    }
+
+    public async getPlayerDetail(platform: 'PC' | 'PS4' | 'X1', username: string): Promise<userDetail | error> {
         return this.cache(['player_detail', platform, username], async () => {
             return this.requestor_als(upath.join('bridge'), { auth: auth.alsKey, player: username, platform })
                 .then((res) => { return res; })

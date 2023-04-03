@@ -19,13 +19,18 @@ class ApexConnect extends BaseCommand {
         if (!username) {
             return session.reply('请输入用户名');
         }
-        let message = (await session.send(new Card().addText('正在加载……请稍候')));
-        let messageId = message ? message.msg_id : '';
+        const { err, data } = (await session.send(new Card().addText('正在加载……请稍候')));
+        if (err) return this.logger.error(err);
+        let messageId = data.msg_id;
         if (humanToTrackerGG[plat]) {
             platform = humanToTrackerGG[plat];
         }
         return this.apexClient.getPlayerDetail(platform, username)
-            .then(async () => {
+            .then(async (user) => {
+                if (this.apexClient.isError(user)) {
+                    return session.update(messageId, new Card()
+                        .addText(`绑定名为 ${username} 的 ${platform} 用户的资料失败\n(font)${user.Error}(font)[danger]`));
+                }
                 this.apexClient.connectPlatform(platform, username, session.authorId);
                 this.apexClient.writeConnectionMap();
                 session.update(messageId, new Card().addText(`绑定成功！`));
@@ -34,7 +39,8 @@ class ApexConnect extends BaseCommand {
                 apexSearch.exec(ses);
             }).catch((e) => {
                 // console.log(e);
-                session.update(messageId, new Card().addText(`获取名为 ${username} 的 ${platform} 用户的资料失败\n此用户可能不存在，请检查输入`));
+                this.logger.error(e);
+                session.update(messageId, new Card().addText(`绑定名为 ${username} 的 ${platform} 用户的资料失败\n(font)其他错误(font)[danger]`));
             });
     }
 }

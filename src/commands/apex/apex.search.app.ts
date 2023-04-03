@@ -30,13 +30,21 @@ class ApexSearch extends BaseCommand {
         if (humanToTrackerGG[plat]) {
             platform = humanToTrackerGG[plat];
         }
-        let message = (await session.send(new Card().addText('正在加载……请稍候')));
+        const { err, data } = (await session.send(new Card().addText('正在加载……请稍候')));
+        if (err) return this.logger.error(err);
+        let messageId = data.msg_id;
         this.logger.info(`Sent initial message, processing time ${Date.now() - last_ts}ms`);
         last_ts = Date.now();
-        let messageId = message ? message.msg_id : '';
         return this.apexClient.getPlayerDetail(platform, username)
             .then(async (user) => {
+                if (this.apexClient.isError(user)) {
+                    return session.update(messageId, new Card()
+                        .addText(`获取名为 ${username} 的 ${platform} 用户的资料失败\n(font)${user.Error}(font)[danger]`));
+                }
+                // console.dir(user, { depth: 1 });
                 this.logger.info(`Got player stat, processing time ${Date.now() - last_ts}ms`);
+                session.update(messageId, new Card()
+                    .addText(`已获取用户资料，耗时 (font)${(Date.now() - last_ts) / 1000}s(font)[${Date.now() - last_ts > 1500 ? Date.now() - ts > 3000 ? 'danger' : 'warning' : 'success'}]`));
                 last_ts = Date.now();
                 this.logger.debug('Generation: Recieved data from remote API');
                 let br_predator = await this.apexClient.getPredatorRequirement('RP', platform);
@@ -105,12 +113,18 @@ class ApexSearch extends BaseCommand {
                 });
 
                 this.logger.info(`Generated image, processing time ${Date.now() - last_ts}ms`);
+                session.update(messageId, new Card()
+                    .addText(`已生成图像，耗时 (font)${(Date.now() - last_ts) / 4000}s(font)[${Date.now() - last_ts > 6000 ? Date.now() - ts > 3000 ? 'danger' : 'warning' : 'success'}]`));
                 last_ts = Date.now();
                 this.logger.debug('Generation: Start uploading');
                 buffer = await sharp(buffer).jpeg().toBuffer();
-                let url = (await bot.API.asset.create(buffer, { filename: 'image.jpg' }))?.url;
+                const { err, data } = (await bot.API.asset.create(buffer, { filename: 'image.jpg' }));
+                if (err) return this.logger.error(err);
+                let url = data.url;
                 if (!url) throw new Error('Cannot upload image');
                 this.logger.info(`Uploaded image, processing time ${Date.now() - last_ts}ms`);
+                session.update(messageId, new Card()
+                    .addText(`已上传图像，耗时 (font)${(Date.now() - last_ts) / 1000}s(font)[${Date.now() - last_ts > 1500 ? Date.now() - ts > 3000 ? 'danger' : 'warning' : 'success'}]`));
                 last_ts = Date.now();
                 this.logger.debug('Generation: Present image to user');
                 await session.update(messageId, new Card()
@@ -122,7 +136,8 @@ class ApexSearch extends BaseCommand {
                 this.logger.info(`Generation time: ${Date.now() - ts}ms`);
             }).catch((e) => {
                 // console.log(e);
-                session.update(messageId, new Card().addText(`获取名为 ${username} 的 ${platform} 用户的资料失败\n此用户可能不存在，请检查输入`));
+                this.logger.error(e);
+                session.update(messageId, new Card().addText(`获取名为 ${username} 的 ${platform} 用户的资料失败\n(font)其他错误(font)[danger]`));
             });
     }
 }

@@ -114,7 +114,7 @@ class ApexSearch extends BaseCommand {
 
                 this.logger.info(`Generated image, processing time ${Date.now() - last_ts}ms`);
                 await session.update(messageId, new Card()
-                    .addText(`已生成图像，耗时 (font)${(Date.now() - last_ts) / 4000}s(font)[${Date.now() - last_ts > 6000 ? Date.now() - ts > 3000 ? 'danger' : 'warning' : 'success'}]`));
+                    .addText(`已生成图像，耗时 (font)${(Date.now() - last_ts) / 1000}s(font)[${Date.now() - last_ts > 6000 ? Date.now() - ts > 3000 ? 'danger' : 'warning' : 'success'}]`));
                 last_ts = Date.now();
                 this.logger.debug('Generation: Start uploading');
                 buffer = await sharp(buffer).jpeg().toBuffer();

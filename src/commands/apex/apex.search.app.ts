@@ -117,7 +117,7 @@ class ApexSearch extends BaseCommand {
                     .addText(`已生成图像，耗时 (font)${(Date.now() - last_ts) / 1000}s(font)[${Date.now() - last_ts > 6000 ? Date.now() - ts > 3000 ? 'danger' : 'warning' : 'success'}]`));
                 last_ts = Date.now();
                 this.logger.debug('Generation: Start uploading');
-                buffer = await sharp(buffer).jpeg().toBuffer();
+                buffer = await sharp(buffer).resize(1000).jpeg().toBuffer();
                 const { err, data } = (await bot.API.asset.create(buffer, { filename: 'image.jpg' }));
                 if (err) return this.logger.error(err);
                 let url = data.url;
